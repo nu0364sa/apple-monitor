@@ -28,9 +28,16 @@ def check_stock():
     soup = BeautifulSoup(response.text, "html.parser")
     page_text = soup.get_text()
 
-    # 条件判定：「Mac Studio」かつ「128GB」が含まれているか
-    if "Mac Studio" in page_text and "128GB" in page_text:
-        msg = f"🚨 **【入荷検知】Mac Studio 128GB の整備済製品が出ました！**\n{TARGET_URL}"
+    # 条件判定：「Mac mini」「M4 Pro」「64GB」を含み、かつ「1TB」以上のSSD条件を満たすか
+    has_mac_mini = "Mac mini" in page_text
+    has_m4_pro = "M4 Pro" in page_text
+    has_64gb = "64GB" in page_text
+    
+    # 1TB, 2TB, 4TB, 8TB のいずれかが含まれているか判定
+    has_target_storage = any(storage in page_text for storage in ["1TB", "2TB", "4TB", "8TB"])
+
+    if has_mac_mini and has_m4_pro and has_64gb and has_target_storage:
+        msg = f"🚨 **【入荷検知】Mac mini (M4 Pro / 64GB / 1TB以上) の整備済製品が出ました！**\n{TARGET_URL}"
         send_discord_notify(msg)
         print("条件合致：通知を送信しました。")
     else:
